@@ -13,36 +13,72 @@
 
 # set up environment
 import json
-import nibabel as nib
-import dipy
+import os
+import shutil
+import glob
+from scripts.qsmxt_functions import sys_cmd
 
-from dipy.align.reslice import reslice
-from dipy.data import get_fnames
+# create necessary directories
+work_dir = os.path.abspath("work_dir")
+in_dir = os.path.join(work_dir, "0_inputs")
+bids_dir = os.path.join(work_dir, "1_bids")
+qsm_dir = os.path.join(work_dir, "2_qsm")
+out_dir = os.path.abspath("out_dir")
+os.makedirs(work_dir, exist_ok=True)
+os.makedirs(in_dir, exist_ok=True)
+os.makedirs(bids_dir, exist_ok=True)
+os.makedirs(qsm_dir, exist_ok=True)
+os.makedirs(out_dir, exist_ok=True)
 
 # load inputs from config.json
-with open('config.json') as config_json:
-	config = json.load(config_json)
+with open('config.json') as config_json_file_handle:
+	config_json = json.load(config_json_file_handle)
+
+with open(config_json['phs-json']) as phase_json_file_handle:
+	phase_json = json.load(phase_json_file_handle)
+	TE = phase_json['EchoTime']
+	TE_idx = 1 if 'EchoNumber' not in phase_json else int(phase_json['EchoNumber'])
+	if (('EchoTrainLength' in phase_json and int(phase_json['EchoTrainLength']) > 1) or
+	   ('EchoNumber' in phase_json and int(phase_json['EchoTrainLength']) > 1)):
+		suffix = 'MEGRE'
+		file_pattern = "sub-1_ses-1_run-1_echo-{TE_idx}_part-{part}_{suffix}.{ext}"
+	else:
+		suffix = 'T2starw'
+		file_pattern = "sub-1_ses-1_run-1_part-{part}_{suffix}.{ext}"
+
+# TODO: Make this better! This information should probably be given by the brainlife datatype
+#       because JSON headers tend to be unreliable!
+if suffix == 'T2starw':
+	with open(config_json['phs-json']) as phase_json_file_handle:
+		phase_json = json.load(phase_json_file_handle)
+	phase_json['EchoNumber'] = 1
+	phase_json['EchoTrainLength'] = 1
+	with open(config_json['phs-json'], 'w') as phase_json_file_handle:
+		json.dump(phase_json, phase_json_file_handle)
+
+	with open(config_json['mag-json']) as mag_json_file_handle:
+		mag_json = json.load(mag_json_file_handle)
+	mag_json['EchoNumber'] = 1
+	mag_json['EchoTrainLength'] = 1
+	with open(config_json['mag-json'], 'w') as mag_json_file_handle:
+		json.dump(mag_json, mag_json_file_handle)
 
 # Load into variables predefined code inputs
-data_file = str(config['t1'])
- 
-# set the output resolution
-out_res = [ int(v) for v in config['outres'].split(" ")]
+mag_nii_path = os.path.abspath(config_json['mag'])
+phs_nii_path = os.path.abspath(config_json['phs'])
+mag_json_path = os.path.abspath(config_json['mag-json'])
+phs_json_path = os.path.abspath(config_json['phs-json'])
 
-# we load the input T1w that we would like to resample
-img = nib.load(data_file)
+shutil.copy(mag_nii_path, os.path.join(in_dir, file_pattern.format(TE_idx=TE_idx, part="mag", suffix=suffix, ext="nii")))
+shutil.copy(phs_nii_path, os.path.join(in_dir, file_pattern.format(TE_idx=TE_idx, part="phase", suffix=suffix, ext="nii")))
+shutil.copy(mag_json_path, os.path.join(in_dir, file_pattern.format(TE_idx=TE_idx, part="mag", suffix=suffix, ext="json")))
+shutil.copy(phs_json_path, os.path.join(in_dir, file_pattern.format(TE_idx=TE_idx, part="phase", suffix=suffix, ext="json")))
 
-# we get the data from the nifti file
-input_data   = img.get_data()
-input_affine = img.affine
-input_zooms  = img.header.get_zooms()[:3]
+sys_cmd(cmd=f"run_1_niftiConvert.py {in_dir} {bids_dir} --t2starw_protocol_patterns '*' --auto_yes")
+sys_cmd(cmd=f"run_2_qsm.py {bids_dir} {qsm_dir} --auto_yes")
 
-# resample the data
-out_data, out_affine = reslice(input_data, input_affine, input_zooms, out_res)
+qsm_files = glob.glob(os.path.join(qsm_dir, "qsm_final", "**", "*"))
 
-# create the new NIFTI file for the output
-out_img = nib.Nifti1Image(out_data, out_affine)
-
-# save the output file (with the new resolution) to disk
-nib.save(out_img, 'out_dir/t1.nii.gz')
+for qsm_file in qsm_files:
+	shutil.copy(qsm_file, os.path.join(out_dir, os.path.split(qsm_file)[1]))
 
