@@ -15,4 +15,4 @@
 mkdir -p out_dir
 
 # run the actual python code
-singularity exec docker://brainlife/dipy:1.1.1 python3 main.py
+singularity exec docker://vnmd/qsmxt_2.1.0 python3 main.py

@@ -1,6 +1,0 @@
-{
-    "mag": "/home/ashley/neurodesktop-storage/brainlife/bids/sub-2/ses-1/anat/sub-2_ses-1_run-01_part-mag_T2starw.nii",
-    "phs": "/home/ashley/neurodesktop-storage/brainlife/bids/sub-2/ses-1/anat/sub-2_ses-1_run-01_part-phase_T2starw.nii",
-    "phs-json": "/home/ashley/neurodesktop-storage/brainlife/bids/sub-2/ses-1/anat/sub-2_ses-1_run-01_part-phase_T2starw.json",
-    "mag-json": "/home/ashley/neurodesktop-storage/brainlife/bids/sub-2/ses-1/anat/sub-2_ses-1_run-01_part-mag_T2starw.json"
-}
