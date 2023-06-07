@@ -80,5 +80,5 @@ sys_cmd(cmd=f"run_2_qsm.py {bids_dir} {qsm_dir} --auto_yes")
 qsm_files = glob.glob(os.path.join(qsm_dir, "qsm_final", "**", "*"))
 
 for qsm_file in qsm_files:
-	shutil.copy(qsm_file, os.path.join(out_dir, "cifti.nii"))
+	shutil.copy(qsm_file, os.path.join(out_dir, "qsm.nii"))
 
