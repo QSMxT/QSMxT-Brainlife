@@ -12,6 +12,7 @@
 # The University of Texas at Austin
 
 # set up environment
+print("[INFO] Importing Python modules")
 import json
 import os
 import shutil
@@ -19,6 +20,7 @@ import glob
 from scripts.qsmxt_functions import sys_cmd
 
 # create necessary directories
+print("[INFO] Creating directories...")
 work_dir = os.path.abspath("work_dir")
 in_dir = os.path.join(work_dir, "0_inputs")
 bids_dir = os.path.join(work_dir, "1_bids")
@@ -31,6 +33,7 @@ os.makedirs(qsm_dir, exist_ok=True)
 os.makedirs(out_dir, exist_ok=True)
 
 # load inputs from config.json
+print("[INFO] Loading configuration...")
 with open('config.json') as config_json_file_handle:
 	config_json = json.load(config_json_file_handle)
 
@@ -69,16 +72,20 @@ phs_nii_path = os.path.abspath(config_json['phs'])
 mag_json_path = os.path.abspath(config_json['mag-json'])
 phs_json_path = os.path.abspath(config_json['phs-json'])
 
+print("[INFO] Copying files to NIfTI directory...")
 shutil.copy(mag_nii_path, os.path.join(in_dir, file_pattern.format(TE_idx=TE_idx, part="mag", suffix=suffix, ext="nii")))
 shutil.copy(phs_nii_path, os.path.join(in_dir, file_pattern.format(TE_idx=TE_idx, part="phase", suffix=suffix, ext="nii")))
 shutil.copy(mag_json_path, os.path.join(in_dir, file_pattern.format(TE_idx=TE_idx, part="mag", suffix=suffix, ext="json")))
 shutil.copy(phs_json_path, os.path.join(in_dir, file_pattern.format(TE_idx=TE_idx, part="phase", suffix=suffix, ext="json")))
 
+print("[INFO] Running run_1_niftiConvert.py...")
 sys_cmd(cmd=f"run_1_niftiConvert.py {in_dir} {bids_dir} --t2starw_protocol_patterns '*' --auto_yes")
+print("[INFO] Running run_2_qsm.py")
 sys_cmd(cmd=f"run_2_qsm.py {bids_dir} {qsm_dir} --auto_yes")
 
 qsm_files = glob.glob(os.path.join(qsm_dir, "qsm_final", "**", "*"))
 
+print("[INFO] Copying QSM files to output directory...")
 for qsm_file in qsm_files:
 	shutil.copy(qsm_file, os.path.join(out_dir, "qsm.nii"))
 

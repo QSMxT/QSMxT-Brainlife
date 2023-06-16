@@ -6,5 +6,6 @@
 #SBATCH --time=01:00:00
 
 # run the actual python code
+echo "[INFO] Starting QSMxT singularity container..."
 singularity exec docker://vnmd/qsmxt_2.1.0 python3 main.py
 
