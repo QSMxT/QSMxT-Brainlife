@@ -37,7 +37,7 @@ print("[INFO] Loading configuration...")
 with open('config.json') as config_json_file_handle:
 	config_json = json.load(config_json_file_handle)
 
-with open(config_json['phase-json']) as phase_json_file_handle:
+with open(config_json['phase-json'][0]) as phase_json_file_handle:
 	phase_json = json.load(phase_json_file_handle)
 	TE = phase_json['EchoTime']
 	TE_idx = 1 if 'EchoNumber' not in phase_json else int(phase_json['EchoNumber'])
@@ -52,25 +52,25 @@ with open(config_json['phase-json']) as phase_json_file_handle:
 # TODO: Make this better! This information should probably be given by the brainlife datatype
 #       because JSON headers tend to be unreliable!
 if suffix == 'T2starw':
-	with open(config_json['phase-json']) as phase_json_file_handle:
+	with open(config_json['phase-json'][0]) as phase_json_file_handle:
 		phase_json = json.load(phase_json_file_handle)
 	phase_json['EchoNumber'] = 1
 	phase_json['EchoTrainLength'] = 1
-	with open(config_json['phase-json'], 'w') as phase_json_file_handle:
+	with open(config_json['phase-json'][0], 'w') as phase_json_file_handle:
 		json.dump(phase_json, phase_json_file_handle)
 
-	with open(config_json['mag-json']) as mag_json_file_handle:
+	with open(config_json['mag-json'][0]) as mag_json_file_handle:
 		mag_json = json.load(mag_json_file_handle)
 	mag_json['EchoNumber'] = 1
 	mag_json['EchoTrainLength'] = 1
-	with open(config_json['mag-json'], 'w') as mag_json_file_handle:
+	with open(config_json['mag-json'][0], 'w') as mag_json_file_handle:
 		json.dump(mag_json, mag_json_file_handle)
 
 # Load into variables predefined code inputs
-mag_nii_path = os.path.abspath(config_json['mag'])
-phs_nii_path = os.path.abspath(config_json['phase'])
-mag_json_path = os.path.abspath(config_json['mag-json'])
-phs_json_path = os.path.abspath(config_json['phase-json'])
+mag_nii_path = os.path.abspath(config_json['mag'][0])
+phs_nii_path = os.path.abspath(config_json['phase'][0])
+mag_json_path = os.path.abspath(config_json['mag-json'][0])
+phs_json_path = os.path.abspath(config_json['phase-json'][0])
 
 print("[INFO] Copying files to NIfTI directory...")
 shutil.copy(mag_nii_path, os.path.join(in_dir, file_pattern.format(TE_idx=TE_idx, part="mag", suffix=suffix, ext="nii")))
