@@ -5,7 +5,7 @@
 #SBATCH --mem=16G
 #SBATCH --time=01:00:00
 
-export container=qsmxt_2.1.0_20230509
+export container=qsmxt_3.0.0_20230628
 
 echo "[INFO] Pulling QSMxT singularity container... (US)"
 curl -X GET https://objectstorage.us-ashburn-1.oraclecloud.com/n/sd63xuke79z3/b/neurodesk/o/${container}.simg -O
