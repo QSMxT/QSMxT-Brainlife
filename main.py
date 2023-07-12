@@ -68,7 +68,7 @@ shutil.copy(phs_json_path, os.path.join(in_dir, file_pattern.format(TE_idx=TE_id
 print("[INFO] Running run_1_niftiConvert.py...")
 sys_cmd(cmd=f"run_1_niftiConvert.py {in_dir} {bids_dir} --t2starw_protocol_patterns '*' --auto_yes")
 print("[INFO] Running run_2_qsm.py")
-sys_cmd(cmd=f"run_2_qsm.py {bids_dir} {qsm_dir} --auto_yes")
+sys_cmd(cmd=f"run_2_qsm.py {bids_dir} {qsm_dir} --premade {config_json['premade']} --auto_yes")
 
 qsm_files = glob.glob(os.path.join(qsm_dir, "qsm_final", "**", "*"))
 

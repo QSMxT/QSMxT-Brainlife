@@ -128,5 +128,7 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+in_dir/
 work_dir/
 out_dir/
+config.json
