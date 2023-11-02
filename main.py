@@ -77,7 +77,7 @@ for i in range(lengths[0]):
 	shutil.copy(phs_json_path, os.path.join(in_dir, file_pattern.format(TE_idx=i+1, part="phase", suffix=suffix, ext="json")))
 
 print("[INFO] Running nifti-convert...")
-sys_cmd(cmd=f"niftic-convert {in_dir} {bids_dir} --qsm_protocol_patterns '*' --auto_yes")
+sys_cmd(cmd=f"nifti-convert {in_dir} {bids_dir} --qsm_protocol_patterns '*' --auto_yes")
 print("[INFO] Running qsmxt")
 sys_cmd(cmd=f"qsmxt {bids_dir} {qsm_dir} --premade {config_json['premade']} --auto_yes")
 
