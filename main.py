@@ -7,7 +7,7 @@ import json
 import os
 import shutil
 import glob
-from qsmxt.scripts.qsmxt_functions import sys_cmd
+from qsmxt.scripts.sys_cmd import sys_cmd
 
 # create necessary directories
 print("[INFO] Creating directories...")
@@ -83,10 +83,12 @@ for i in range(lengths[0]):
 
 
 print("[INFO] Running nifti-convert...")
-sys_cmd(cmd=f"nifti-convert {in_dir} {bids_dir} --auto_yes")
-sys_cmd(cmd=f"nifti-convert {in_dir} {bids_dir} --auto_yes")
+sys_cmd(cmd=f"nifti-convert {in_dir} {bids_dir} --auto_yes", print_output=True, raise_exception=True)
+sys_cmd(cmd=f"nifti-convert {in_dir} {bids_dir} --auto_yes", print_output=True, raise_exception=True)
 print("[INFO] Running qsmxt")
-sys_cmd(cmd=f"qsmxt {bids_dir} {qsm_dir} --premade {config_json['premade']} --auto_yes")
+sys_cmd(cmd=f"qsmxt {bids_dir} {qsm_dir} --premade {config_json['premade']} --auto_yes", print_output=True, raise_exception=True)
+
+#sys_cmd(cmd, print_output=True, print_command=True, raise_exception=False):
 
 qsm_files = glob.glob(os.path.join(qsm_dir, "qsm_final", "**", "*"))
 
