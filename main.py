@@ -83,8 +83,8 @@ for i in range(lengths[0]):
 
 
 print("[INFO] Running nifti-convert...")
-sys_cmd(cmd=f"nifti-convert {in_dir} {bids_dir} --qsm_protocol_patterns '*' --auto_yes")
-sys_cmd(cmd=f"nifti-convert {in_dir} {bids_dir} --qsm_protocol_patterns '*' --auto_yes")
+sys_cmd(cmd=f"nifti-convert {in_dir} {bids_dir} --auto_yes")
+sys_cmd(cmd=f"nifti-convert {in_dir} {bids_dir} --auto_yes")
 print("[INFO] Running qsmxt")
 sys_cmd(cmd=f"qsmxt {bids_dir} {qsm_dir} --premade {config_json['premade']} --auto_yes")
 
