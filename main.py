@@ -71,14 +71,14 @@ for i in range(lengths[0]):
 	phs_json_path = os.path.abspath(config_json['phase-json'][i])
 
 	print("[INFO] Copying files to NIfTI directory...")
-	print(f"[INFO] {mag_nii_path} -> {os.path.join(in_dir, file_pattern.format(TE_idx=i+1, part="mag", suffix=suffix, ext="nii"))}")
-	shutil.copy(mag_nii_path, os.path.join(in_dir, file_pattern.format(TE_idx=i+1, part="mag", suffix=suffix, ext="nii")))
-	print(f"[INFO] {phs_nii_path} -> {os.path.join(in_dir, file_pattern.format(TE_idx=i+1, part="phase", suffix=suffix, ext="nii"))}")
-	shutil.copy(phs_nii_path, os.path.join(in_dir, file_pattern.format(TE_idx=i+1, part="phase", suffix=suffix, ext="nii")))
-	print(f"[INFO] {mag_json_path} -> {os.path.join(in_dir, file_pattern.format(TE_idx=i+1, part="mag", suffix=suffix, ext="json"))}")
-	shutil.copy(mag_json_path, os.path.join(in_dir, file_pattern.format(TE_idx=i+1, part="mag", suffix=suffix, ext="json")))
-	print(f"[INFO] {phs_json_path} -> {os.path.join(in_dir, file_pattern.format(TE_idx=i+1, part="phase", suffix=suffix, ext="json"))}")
-	shutil.copy(phs_json_path, os.path.join(in_dir, file_pattern.format(TE_idx=i+1, part="phase", suffix=suffix, ext="json")))
+	print(f"[INFO] {mag_nii_path} -> {os.path.join(in_dir, file_pattern.format(TE_idx=i+1, part='mag', suffix=suffix, ext='nii'))}")
+	shutil.copy(mag_nii_path, os.path.join(in_dir, file_pattern.format(TE_idx=i+1, part='mag', suffix=suffix, ext='nii')))
+	print(f"[INFO] {phs_nii_path} -> {os.path.join(in_dir, file_pattern.format(TE_idx=i+1, part='phase', suffix=suffix, ext='nii'))}")
+	shutil.copy(phs_nii_path, os.path.join(in_dir, file_pattern.format(TE_idx=i+1, part='phase', suffix=suffix, ext='nii')))
+	print(f"[INFO] {mag_json_path} -> {os.path.join(in_dir, file_pattern.format(TE_idx=i+1, part='mag', suffix=suffix, ext='json'))}")
+	shutil.copy(mag_json_path, os.path.join(in_dir, file_pattern.format(TE_idx=i+1, part='mag', suffix=suffix, ext='json')))
+	print(f"[INFO] {phs_json_path} -> {os.path.join(in_dir, file_pattern.format(TE_idx=i+1, part='phase', suffix=suffix, ext='json'))}")
+	shutil.copy(phs_json_path, os.path.join(in_dir, file_pattern.format(TE_idx=i+1, part='phase', suffix=suffix, ext='json')))
 	print(f"[INFO] Input directory {in_dir} contains: {os.listdir(in_dir)}")
 
 
