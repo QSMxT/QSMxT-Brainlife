@@ -88,7 +88,7 @@ sys_cmd(cmd=f"nifti-convert {in_dir} {bids_dir} --auto_yes", print_output=True, 
 print("[INFO] Running qsmxt")
 sys_cmd(cmd=f"qsmxt {bids_dir} {qsm_dir} --premade {config_json['premade']} --auto_yes", print_output=True, raise_exception=True)
 
-qsm_files = glob.glob(os.path.join(qsm_dir, "qsm", "*"))
+qsm_files = glob.glob(os.path.join(qsm_dir, "qsm", "*.nii*"))
 if len(qsm_files) == 0: raise Exception(f"No QSM files found in output directory {os.path.join(qsm_dir, 'qsm')}")
 
 print("[INFO] Copying QSM files to output directory...")
