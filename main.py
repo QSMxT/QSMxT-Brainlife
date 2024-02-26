@@ -10,7 +10,6 @@ import glob
 import base64
 
 import nibabel as nib
-import seaborn as sns
 from matplotlib import pyplot as plt
 
 from metrics import all_metrics
@@ -105,12 +104,26 @@ for qsm_file in qsm_files:
 if 'qsm' in config_json:
 	def plot_error_metrics(metrics, title="Error Metrics"):
 		# Create a bar plot for the metrics
+		#sns.set_theme(style='whitegrid')
 		plt.figure(figsize=(10, 6))
-		sns.barplot(x=list(metrics.keys()), y=list(metrics.values()))
-		plt.title(title)
+		
+		# stem function
+		plt.ylim(0, 1.0)
+		
+		# stem function: If x is not provided, a sequence of numbers is created by python:
+		plt.stem(metrics.keys(), metrics.values())
+
+		plt.title('QSM evaluation metrics')
+		plt.xlabel('Metric')
 		plt.ylabel('Value')
 		plt.xticks(rotation=45)
 		plt.tight_layout()
+    
+		# Annotate each point with its value
+		for key, value in metrics.items():
+			plt.text(key, value + 0.01, f"{value:.3f}", 
+					ha='left', va='bottom', 
+					fontsize=8, rotation=0)
 		
 		# Save the plot as a PNG file
 		plt.savefig("metrics_plot.png")
@@ -135,12 +148,21 @@ if 'qsm' in config_json:
 
 	print("[INFO] Loading QSM results for metrics...")
 	qsm_file = qsm_files[0]
-	ground_truth_file = config_json['ground_truth']
+	ground_truth_file = config_json['qsm']
 	qsm = nib.load(qsm_file).get_fdata()
 	ground_truth = nib.load(ground_truth_file).get_fdata()
 
 	print("[INFO] Computing evaluation metrics...")
 	metrics_dict = all_metrics(qsm, ground_truth)
+	del metrics_dict['RMSE']
+	metrics_dict['NRMSE'] /= 100.0
+	#metrics_dict['HFEN'] 
+	#metrics_dict['MAD']
+	#metrics_dict['XSIM']
+	metrics_dict['CC'] = (metrics_dict['CC'][0] + 1) / 2
+	metrics_dict['NMI'] -= 1 
+	#metrics_dict['GXE']
+
 
 	print("[INFO] Generating figure...")
 	plot_error_metrics(metrics_dict)
