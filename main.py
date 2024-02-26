@@ -7,6 +7,13 @@ import json
 import os
 import shutil
 import glob
+import base64
+
+import nibabel as nib
+import seaborn as sns
+from matplotlib import pyplot as plt
+
+from metrics import all_metrics
 from qsmxt.scripts.sys_cmd import sys_cmd
 
 # create necessary directories
@@ -28,7 +35,7 @@ print("[INFO] Loading configuration...")
 with open('config.json') as config_json_file_handle:
 	config_json = json.load(config_json_file_handle)
 
-# Check if all keys exist
+# Check if all required keys exist
 keys = ['mag', 'phase', 'mag-json', 'phase-json']
 if not all(key in config_json for key in keys):
     raise KeyError("Not all required keys found in the configuration.")
@@ -88,10 +95,62 @@ sys_cmd(cmd=f"nifti-convert {in_dir} {bids_dir} --auto_yes", print_output=True, 
 print("[INFO] Running qsmxt")
 sys_cmd(cmd=f"qsmxt {bids_dir} {qsm_dir} --premade {config_json['premade']} --auto_yes", print_output=True, raise_exception=True)
 
-qsm_files = glob.glob(os.path.join(qsm_dir, "qsm", "*.nii*"))
+qsm_files = glob.glob(os.path.join(qsm_dir, "qsm", "*.nii*"))  
 if len(qsm_files) == 0: raise Exception(f"No QSM files found in output directory {os.path.join(qsm_dir, 'qsm')}")
 
 print("[INFO] Copying QSM files to output directory...")
 for qsm_file in qsm_files:
 	shutil.copy(qsm_file, os.path.join(out_dir, "qsm.nii"))
+
+if 'qsm' in config_json:
+	def plot_error_metrics(metrics, title="Error Metrics"):
+		# Create a bar plot for the metrics
+		plt.figure(figsize=(10, 6))
+		sns.barplot(x=list(metrics.keys()), y=list(metrics.values()))
+		plt.title(title)
+		plt.ylabel('Value')
+		plt.xticks(rotation=45)
+		plt.tight_layout()
+		
+		# Save the plot as a PNG file
+		plt.savefig("metrics_plot.png")
+		plt.close()
+
+	def encode_image_to_base64(image_path):
+		with open(image_path, "rb") as image_file:
+			encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
+		return encoded_string
+
+	def create_json_for_brainlife(encoded_image, image_title="My image title"):
+		data = {
+			"brainlife": [
+				{
+					"type": "image/png",
+					"name": image_title,
+					"base64": encoded_image
+				}
+			]
+		}
+		return json.dumps(data, indent=4)
+
+	print("[INFO] Loading QSM results for metrics...")
+	qsm_file = qsm_files[0]
+	ground_truth_file = config_json['ground_truth']
+	qsm = nib.load(qsm_file).get_fdata()
+	ground_truth = nib.load(ground_truth_file).get_fdata()
+
+	print("[INFO] Computing evaluation metrics...")
+	metrics_dict = all_metrics(qsm, ground_truth)
+
+	print("[INFO] Generating figure...")
+	plot_error_metrics(metrics_dict)
+
+	print("[INFO] Converting figure to base64...")
+	encoded_image = encode_image_to_base64("metrics_plot.png")
+
+	print("[INFO] Generating product.json...")
+	json_data = create_json_for_brainlife(encoded_image)
+	with open('product.json', 'w') as json_file:
+		json_file.write(json_data)
+	
 
