@@ -10,6 +10,9 @@ export container=qsmxt_6.4.0_20240209
 echo "[INFO] Pulling QSMxT singularity container... (US)"
 curl -X GET https://objectstorage.us-ashburn-1.oraclecloud.com/n/sd63xuke79z3/b/neurodesk/o/${container}.simg -O
 
+echo "[INFO] Installing pip dependencies..."
+singularity exec ${container}.simg pip install -U pip
+singularity exec ${container}.simg pip install -U scikit-image
 
 echo "[INFO] Starting main.py..."
 singularity exec ${container}.simg python3 main.py
