@@ -34,63 +34,69 @@ print("[INFO] Loading configuration...")
 with open('config.json') as config_json_file_handle:
 	config_json = json.load(config_json_file_handle)
 
-# Check if all required keys exist
-keys = ['mag', 'phase', 'mag-json', 'phase-json']
-if not all(key in config_json for key in keys):
-    raise KeyError("Not all required keys found in the configuration.")
+if 'bids' in config_json:
+	print(f"[INFO] BIDS input detected! Extracting {config_json['bids']} to {bids_dir}.")
+	sys_cmd(f"tar xf {config_json['bids']} -C {bids_dir}")
 
-# Check if all lengths are equal
-lengths = [len(config_json[key]) for key in keys]
-if not all(length == lengths[0] for length in lengths):
-    raise RuntimeError("The number of input files must be equal for 'mag', 'phase', 'mag-json', and 'phase-json'.")
-
-# setup filepattern
-if lengths[0] == 1:
-	suffix = 'T2starw'
-	file_pattern = "sub-1_ses-1_run-1_part-{part}_{suffix}.{ext}"
 else:
-	suffix = 'MEGRE'
-	file_pattern = "sub-1_ses-1_run-1_echo-{TE_idx}_part-{part}_{suffix}.{ext}"
+	# Check if all required keys exist
+	keys = ['mag', 'phase', 'mag-json', 'phase-json']
+	if not all(key in config_json for key in keys):
+		raise KeyError("Not all required keys found in the configuration.")
 
-# TODO: Make this better! This information should probably be given by the brainlife datatype
-#       because JSON headers tend to be unreliable!
-if suffix == 'T2starw':
-	with open(config_json['phase-json'][0]) as phase_json_file_handle:
-		phase_json = json.load(phase_json_file_handle)
-	phase_json['EchoNumber'] = 1
-	phase_json['EchoTrainLength'] = 1
-	with open(config_json['phase-json'][0], 'w') as phase_json_file_handle:
-		json.dump(phase_json, phase_json_file_handle)
+	# Check if all lengths are equal
+	lengths = [len(config_json[key]) for key in keys]
+	if not all(length == lengths[0] for length in lengths):
+		raise RuntimeError("The number of input files must be equal for 'mag', 'phase', 'mag-json', and 'phase-json'.")
 
-	with open(config_json['mag-json'][0]) as mag_json_file_handle:
-		mag_json = json.load(mag_json_file_handle)
-	mag_json['EchoNumber'] = 1
-	mag_json['EchoTrainLength'] = 1
-	with open(config_json['mag-json'][0], 'w') as mag_json_file_handle:
-		json.dump(mag_json, mag_json_file_handle)
+	# setup filepattern
+	if lengths[0] == 1:
+		suffix = 'T2starw'
+		file_pattern = "sub-1_ses-1_run-1_part-{part}_{suffix}.{ext}"
+	else:
+		suffix = 'MEGRE'
+		file_pattern = "sub-1_ses-1_run-1_echo-{TE_idx}_part-{part}_{suffix}.{ext}"
 
-# Load into variables predefined code inputs
-for i in range(lengths[0]):
-	mag_nii_path = os.path.abspath(config_json['mag'][i])
-	phs_nii_path = os.path.abspath(config_json['phase'][i])
-	mag_json_path = os.path.abspath(config_json['mag-json'][i])
-	phs_json_path = os.path.abspath(config_json['phase-json'][i])
+	# TODO: Make this better! This information should probably be given by the brainlife datatype
+	#       because JSON headers tend to be unreliable!
+	if suffix == 'T2starw':
+		with open(config_json['phase-json'][0]) as phase_json_file_handle:
+			phase_json = json.load(phase_json_file_handle)
+		phase_json['EchoNumber'] = 1
+		phase_json['EchoTrainLength'] = 1
+		with open(config_json['phase-json'][0], 'w') as phase_json_file_handle:
+			json.dump(phase_json, phase_json_file_handle)
 
-	print("[INFO] Copying files to NIfTI directory...")
-	print(f"[INFO] {mag_nii_path} -> {os.path.join(in_dir, file_pattern.format(TE_idx=i+1, part='mag', suffix=suffix, ext='nii'))}")
-	shutil.copy(mag_nii_path, os.path.join(in_dir, file_pattern.format(TE_idx=i+1, part='mag', suffix=suffix, ext='nii')))
-	print(f"[INFO] {phs_nii_path} -> {os.path.join(in_dir, file_pattern.format(TE_idx=i+1, part='phase', suffix=suffix, ext='nii'))}")
-	shutil.copy(phs_nii_path, os.path.join(in_dir, file_pattern.format(TE_idx=i+1, part='phase', suffix=suffix, ext='nii')))
-	print(f"[INFO] {mag_json_path} -> {os.path.join(in_dir, file_pattern.format(TE_idx=i+1, part='mag', suffix=suffix, ext='json'))}")
-	shutil.copy(mag_json_path, os.path.join(in_dir, file_pattern.format(TE_idx=i+1, part='mag', suffix=suffix, ext='json')))
-	print(f"[INFO] {phs_json_path} -> {os.path.join(in_dir, file_pattern.format(TE_idx=i+1, part='phase', suffix=suffix, ext='json'))}")
-	shutil.copy(phs_json_path, os.path.join(in_dir, file_pattern.format(TE_idx=i+1, part='phase', suffix=suffix, ext='json')))
-	print(f"[INFO] Input directory {in_dir} contains: {os.listdir(in_dir)}")
+		with open(config_json['mag-json'][0]) as mag_json_file_handle:
+			mag_json = json.load(mag_json_file_handle)
+		mag_json['EchoNumber'] = 1
+		mag_json['EchoTrainLength'] = 1
+		with open(config_json['mag-json'][0], 'w') as mag_json_file_handle:
+			json.dump(mag_json, mag_json_file_handle)
+
+	# Load into variables predefined code inputs
+	for i in range(lengths[0]):
+		mag_nii_path = os.path.abspath(config_json['mag'][i])
+		phs_nii_path = os.path.abspath(config_json['phase'][i])
+		mag_json_path = os.path.abspath(config_json['mag-json'][i])
+		phs_json_path = os.path.abspath(config_json['phase-json'][i])
+
+		print("[INFO] Copying files to NIfTI directory...")
+		print(f"[INFO] {mag_nii_path} -> {os.path.join(in_dir, file_pattern.format(TE_idx=i+1, part='mag', suffix=suffix, ext='nii'))}")
+		shutil.copy(mag_nii_path, os.path.join(in_dir, file_pattern.format(TE_idx=i+1, part='mag', suffix=suffix, ext='nii')))
+		print(f"[INFO] {phs_nii_path} -> {os.path.join(in_dir, file_pattern.format(TE_idx=i+1, part='phase', suffix=suffix, ext='nii'))}")
+		shutil.copy(phs_nii_path, os.path.join(in_dir, file_pattern.format(TE_idx=i+1, part='phase', suffix=suffix, ext='nii')))
+		print(f"[INFO] {mag_json_path} -> {os.path.join(in_dir, file_pattern.format(TE_idx=i+1, part='mag', suffix=suffix, ext='json'))}")
+		shutil.copy(mag_json_path, os.path.join(in_dir, file_pattern.format(TE_idx=i+1, part='mag', suffix=suffix, ext='json')))
+		print(f"[INFO] {phs_json_path} -> {os.path.join(in_dir, file_pattern.format(TE_idx=i+1, part='phase', suffix=suffix, ext='json'))}")
+		shutil.copy(phs_json_path, os.path.join(in_dir, file_pattern.format(TE_idx=i+1, part='phase', suffix=suffix, ext='json')))
+		print(f"[INFO] Input directory {in_dir} contains: {os.listdir(in_dir)}")
 
 
-print("[INFO] Running nifti-convert...")
-sys_cmd(cmd=f"nifti-convert {in_dir} {bids_dir} --auto_yes", print_output=True, raise_exception=True)
-sys_cmd(cmd=f"nifti-convert {in_dir} {bids_dir} --auto_yes", print_output=True, raise_exception=True)
+	print("[INFO] Running nifti-convert...")
+	sys_cmd(cmd=f"nifti-convert {in_dir} {bids_dir} --auto_yes", print_output=True, raise_exception=True)
+	sys_cmd(cmd=f"nifti-convert {in_dir} {bids_dir} --auto_yes", print_output=True, raise_exception=True)
+
 print("[INFO] Running qsmxt")
 sys_cmd(cmd=f"qsmxt {bids_dir} {qsm_dir} --premade {config_json['premade']} --auto_yes", print_output=True, raise_exception=True)
 
