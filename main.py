@@ -1,18 +1,13 @@
 #!/usr/bin/env python
 
-# set up environment
-print("[INFO] Importing Python modules")
+print("[INFO] Importing modules...")
 
 import json
 import os
 import shutil
 import glob
-import base64
-
 import nibabel as nib
-from matplotlib import pyplot as plt
 
-from metrics import all_metrics
 from qsmxt.scripts.sys_cmd import sys_cmd
 
 # create necessary directories
@@ -35,27 +30,35 @@ with open('config.json') as config_json_file_handle:
 	config_json = json.load(config_json_file_handle)
 
 # Check if all required keys exist
+print("[INFO] Checking required keys...")
 keys = ['mag', 'phase', 'mag-json', 'phase-json']
 if not all(key in config_json for key in keys):
 	raise KeyError("Not all required keys found in the configuration.")
 
 # Check if all lengths are equal
+print("[INFO] Checking key lengths...")
 lengths = [len(config_json[key]) for key in keys]
 if not all(length == lengths[0] for length in lengths):
 	raise RuntimeError("The number of input files must be equal for 'mag', 'phase', 'mag-json', and 'phase-json'.")
 
 # Check length of fourth dimension
+print("[INFO] Checking for 4D inputs...")
 length_4d = 1
 with open(config_json['mag-json'][0]) as json_file:
 	json_data = json.load(json_file)
 	if 'echoes' in json_data:
 		length_4d = len(json_data['echoes'])
+		print("[INFO] 4D inputs found!")
+	else:
+		print("[INFO] 3D inputs found!")
 
 # setup filepattern
 if lengths[0] == 1 and length_4d == 1:
+	print("[INFO] Dataset is single-echo (T2starw suffix)")
 	suffix = 'T2starw'
 	file_pattern = "sub-1_ses-1_run-1_part-{part}_{suffix}.{ext}"
 else:
+	print("[INFO] Dataset is multi-echo (MEGRE suffix)")
 	suffix = 'MEGRE'
 	file_pattern = "sub-1_ses-1_run-1_echo-{TE_idx}_part-{part}_{suffix}.{ext}"
 
@@ -63,6 +66,7 @@ if length_4d == 1:
 	# TODO: Make this better! This information should probably be given by the brainlife datatype
 	#       because JSON headers tend to be unreliable!
 	if suffix == 'T2starw':
+		print("[INFO] Ensure EchoNumber and EchoTrainLength are set to 1...")
 		with open(config_json['phase-json'][0]) as phase_json_file_handle:
 			phase_json = json.load(phase_json_file_handle)
 		phase_json['EchoNumber'] = 1
@@ -95,7 +99,9 @@ if length_4d == 1:
 		shutil.copy(phs_json_path, os.path.join(in_dir, file_pattern.format(TE_idx=i+1, part='phase', suffix=suffix, ext='json')))
 		print(f"[INFO] Input directory {in_dir} contains: {os.listdir(in_dir)}")
 else:
+
 	# Split json files
+	print("[INFO] Splitting multi-echo JSON data...")
 	with open(config_json['mag-json'][0]) as json_file:
 		json_data = json.load(json_file)
 		for i in range(len(json_data['echoes'])):
@@ -108,19 +114,13 @@ else:
 				mag_json_file.write(json.dumps(json_data['echoes'][i]))
 			
 	# Split nifti files
+	print("[INFO] Splitting multi-echo NIfTI data...")
 	mag_nii = nib.load(config_json['mag'][0])
 	phase_nii = nib.load(config_json['phase'][0])
-
-	# Get the total number of volumes
 	num_volumes = mag_nii.shape[3]
-
-	# Loop over each volume index
 	for i in range(num_volumes):
-		# Get the 3D image for the current volume
 		mag_3d = mag_nii.slicer[..., i]
 		phase_3d = phase_nii.slicer[..., i]
-
-		# Save the 3D image to the desired location
 		nib.save(mag_3d, os.path.join(in_dir, file_pattern.format(TE_idx=i+1, part='mag', suffix=suffix, ext='nii')))
 		nib.save(phase_3d, os.path.join(in_dir, file_pattern.format(TE_idx=i+1, part='phase', suffix=suffix, ext='nii')))
 
