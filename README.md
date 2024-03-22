@@ -11,7 +11,7 @@ QSM is a form of quantitative MRI that aims to measure the magnetic susceptibili
 
 ## Inputs
 
-The QSMxT Brainlife App takes a [`magphase`](https://brainlife.io/datatype/64792b1c79d13f6418e4fb75) datatype as input, which includes both the magnitude and phase components of an MRI acquisition as NIfTI files, and associated JSON sidecars. For multi-echo acquisitions, echoes should be combined along the 4th dimension of the image volumes, with JSON files combined as elements of a list within a root "echoes" object. 
+The QSMxT Brainlife App takes a [`magphase`](https://brainlife.io/datatype/64792b1c79d13f6418e4fb75) datatype as input, which includes both the magnitude and phase components of an MRI acquisition as NIfTI files, and associated JSON sidecars.
 
 ## Outputs
 
@@ -45,7 +45,7 @@ You can find QSMxT at [brainlife.io](https://brainlife.io/) and execute it via t
 ### Running Locally (on your machine)
 
 1. git clone this repo.
-2. Inside the cloned directory, create `config.json` with something like the following content with paths to your input files. For multi-echo data, you may use multiple elements in the `mag`, `phase`, `mag-json`, and `phase-json` lists. Alternatively, you may use a single 4D NIfTI volume for the `.nii` inputs and a single JSON file for the `.json` files, with each sidecar object stored as an element in a root `echoes` key:
+2. Inside the cloned directory, create `config.json` with something like the following content with paths to your input files. For multi-echo data, you may use multiple elements in the `mag`, `phase`, `mag-json`, and `phase-json` lists:
 
 ```json
 {
