@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=template
+#SBATCH --job-name=qsmxt
 #SBATCH --ntasks-per-node=4
 #SBATCH --mem=16G
 #SBATCH --time=01:00:00
@@ -8,7 +8,7 @@
 export container=qsmxt_7.2.0_20240830
 
 echo "[INFO] Pulling QSMxT singularity container... (US)"
-curl -X GET https://neurocontainers.neurodesk.org/${container}.simg
+curl -X --no-progress-meter GET https://neurocontainers.neurodesk.org/${container}.simg --output ${container}.simg
 
 echo "[INFO] Installing pip dependencies..."
 singularity exec ${container}.simg pip install -U pip
