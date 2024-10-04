@@ -8,7 +8,9 @@
 export container=qsmxt_7.2.0_20240830
 
 echo "[INFO] Pulling QSMxT singularity container... (US)"
-curl -X --no-progress-meter GET https://neurocontainers.neurodesk.org/${container}.simg --output ${container}.simg
+#curl -X --no-progress-meter GET https://neurocontainers.neurodesk.org/${container}.simg --output ${container}.simg
+export SINGULARITY_TMPDIR=`pwd`
+singularity pull ${container}.simg docker://vnmd/qsmxt_7.2.0:20240830
 
 echo "[INFO] Installing pip dependencies..."
 singularity exec ${container}.simg pip install -U pip
