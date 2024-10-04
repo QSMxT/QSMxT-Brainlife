@@ -2,5 +2,6 @@
     "mag": "/home/ashley/neurodesktop-storage/brainlife/QSMxT-Brainlife/in_dir/sub-1_ses-1_run-1_part-mag_T2starw.nii",
     "phase": "/home/ashley/neurodesktop-storage/brainlife/QSMxT-Brainlife/in_dir/sub-1_ses-1_run-1_part-phase_T2starw.nii",
     "mag-json": "/home/ashley/neurodesktop-storage/brainlife/QSMxT-Brainlife/in_dir/sub-1_ses-1_run-1_part-mag_T2starw.json",
-    "phase-json": "/home/ashley/neurodesktop-storage/brainlife/QSMxT-Brainlife/in_dir/sub-1_ses-1_run-1_part-phase_T2starw.json"
+    "phase-json": "/home/ashley/neurodesktop-storage/brainlife/QSMxT-Brainlife/in_dir/sub-1_ses-1_run-1_part-phase_T2starw.json",
+    "cli-params": ""
 }
