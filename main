@@ -10,14 +10,29 @@ export container=qsmxt_7.2.0_20240830
 echo "[INFO] Checking SINGULARITY_BINDPATH..."
 echo $SINGULARITY_BINDPATH
 
-echo "[INFO] Pulling QSMxT singularity container... (US)"
-curl -s -X GET https://neurocontainers.neurodesk.org/${container}.simg -o ${container}.simg
-echo "[INFO] Finished pulling QSMxT singularity container!"
-
+echo "[INFO] Checking for existing container..."
+md5sum=f29e4546d1ba5efe406b65c6b3887e5b
 if [[ -f "${container}.simg" ]]; then
-    echo "[INFO] Singularity image downloaded successfully."
+    echo "[INFO] Found existing container."
+    echo "[INFO] Checking md5sum..."
+    if [[ "$(md5sum ${container}.simg | awk '{print $1}')" == "${md5sum}" ]]; then
+        echo "[INFO] md5sum matched. Skipping download."
+    else
+        echo "[INFO] md5sum mismatch. Redownloading container."
+        rm -f ${container}.simg
+    fi
+fi
+
+if [[ ! -f "${container}.simg" ]]; then
+    echo "[INFO] Pulling QSMxT singularity container... (US)"
+    curl -s -X GET https://neurocontainers.neurodesk.org/${container}.simg -o ${container}.simg
+    echo "[INFO] Finished pulling QSMxT singularity container!"
 else
-    echo "[ERROR] Failed to download Singularity image."
+    echo "[INFO] Using existing container."
+fi
+
+if [[ ! -f "${container}.simg" ]] || [[ "$(md5sum ${container}.simg | awk '{print $1}')" != "${md5sum}" ]]; then
+    echo "[ERROR] Container not found or md5sum mismatch. Exiting..."
     exit 1
 fi
 
