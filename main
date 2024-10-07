@@ -7,9 +7,19 @@
 
 export container=qsmxt_7.2.0_20240830
 
+echo "[INFO] Checking SINGULARITY_BINDPATH..."
+echo $SINGULARITY_BINDPATH
+
 echo "[INFO] Pulling QSMxT singularity container... (US)"
-curl --no-progress-meter -X GET https://neurocontainers.neurodesk.org/${container}.simg -o ${container}.simg
+curl -s -X GET https://neurocontainers.neurodesk.org/${container}.simg -o ${container}.simg
 echo "[INFO] Finished pulling QSMxT singularity container!"
+
+if [[ -f "${container}.simg" ]]; then
+    echo "[INFO] Singularity image downloaded successfully."
+else
+    echo "[ERROR] Failed to download Singularity image."
+    exit 1
+fi
 
 echo "[INFO] Current directory is $(pwd)"
 echo "[INFO] Listing files in current directory $(ls)"
