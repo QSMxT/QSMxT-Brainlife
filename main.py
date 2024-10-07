@@ -142,7 +142,7 @@ if len(qsm_files) == 0: raise Exception(f"No QSM files found in output directory
 print("[INFO] Copying QSM files to output directory...")
 for qsm_file in qsm_files:
 	if qsm_file.endswith(".gz"):
-		sys_cmd(f"gunzip -c {qsm_file}", print_output=True, raise_exception=True).strip()
+		sys_cmd(f"gunzip {qsm_file}", print_output=True, raise_exception=True).strip()
 		qsm_file = qsm_file[:-3]
 
 	shutil.copy(qsm_file, os.path.join(out_dir, f"qsm.nii"))
