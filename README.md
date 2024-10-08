@@ -5,13 +5,67 @@
 
 This is the Brainlife App implementation of [QSMxT](https://qsmxt.github.io/) - an end-to-end software toolbox for Quantitative Susceptibility Mapping (QSM) that automatically reconstructs and processes large datasets in parallel using sensible defaults. See the [QSMxT Brainlife App](https://brainlife.io/app/64805d03b10869ed4e857e2e) page here.
 
-## What is QSM?
+## What is QSM?  
 
 QSM is a form of quantitative MRI that aims to measure the magnetic susceptibility of objects. Susceptibility maps are derived by post-processing the phase component of the complex MRI signal, usually from a 3D gradient-echo (3D-GRE) acquisition. QSM has many applications, mostly in human brain imaging of conditions such as traumatic brain injuries, neuroinflammatory and neurodegenerative diseases, ageing, tumours, with emerging applications across the human body and in animals.
 
 ## Inputs
 
 The QSMxT Brainlife App takes a [`magphase`](https://brainlife.io/datatype/64792b1c79d13f6418e4fb75) datatype as input, which includes both the magnitude and phase components of an MRI acquisition as NIfTI files, and associated JSON sidecars.
+
+### Multi-echo data
+
+QSM often involves processing multi-echo magnitude and phase images. While data for QSM may have an arbitrary number of echoes, Brainlife requires discrete and expected numbers for input files. To get around this, you can store your multi-echo data as a 4D time-series. NIfTI images can be combined using `fsl` via `fslmerge`. JSON files can be merged using the `jsonmerge.py` script included in this repository. See the usage below for an example:
+
+```bash
+~: tree
+~/.../bids/sub-1/anat: tree
+.
+├── sub-1_echo-1_part-mag_MEGRE.json
+├── sub-1_echo-1_part-mag_MEGRE.nii
+├── sub-1_echo-1_part-phase_MEGRE.json
+├── sub-1_echo-1_part-phase_MEGRE.nii
+├── sub-1_echo-2_part-mag_MEGRE.json
+├── sub-1_echo-2_part-mag_MEGRE.nii
+├── sub-1_echo-2_part-phase_MEGRE.json
+├── sub-1_echo-2_part-phase_MEGRE.nii
+├── sub-1_echo-3_part-mag_MEGRE.json
+├── sub-1_echo-3_part-mag_MEGRE.nii
+├── sub-1_echo-3_part-phase_MEGRE.json
+├── sub-1_echo-3_part-phase_MEGRE.nii
+├── sub-1_echo-4_part-mag_MEGRE.json
+├── sub-1_echo-4_part-mag_MEGRE.nii
+├── sub-1_echo-4_part-phase_MEGRE.json
+└── sub-1_echo-4_part-phase_MEGRE.nii
+~: export FSLOUTPUTTYPE=NIFTI
+~: fslmerge -t mag.nii *mag*nii*
+~: fslmerge -t phase.nii *phase*nii*
+~: jsonmerge.py *mag*json mag.json
+~: jsonmerge.py *phase*json phase.json
+~: gunzip *.gz
+~: ls
+.
+├── mag.json
+├── mag.nii
+├── phase.json
+├── phase.nii
+├── sub-1_echo-1_part-mag_MEGRE.json
+├── sub-1_echo-1_part-mag_MEGRE.nii
+├── sub-1_echo-1_part-phase_MEGRE.json
+├── sub-1_echo-1_part-phase_MEGRE.nii
+├── sub-1_echo-2_part-mag_MEGRE.json
+├── sub-1_echo-2_part-mag_MEGRE.nii
+├── sub-1_echo-2_part-phase_MEGRE.json
+├── sub-1_echo-2_part-phase_MEGRE.nii
+├── sub-1_echo-3_part-mag_MEGRE.json
+├── sub-1_echo-3_part-mag_MEGRE.nii
+├── sub-1_echo-3_part-phase_MEGRE.json
+├── sub-1_echo-3_part-phase_MEGRE.nii
+├── sub-1_echo-4_part-mag_MEGRE.json
+├── sub-1_echo-4_part-mag_MEGRE.nii
+├── sub-1_echo-4_part-phase_MEGRE.json
+└── sub-1_echo-4_part-phase_MEGRE.nii
+```
 
 ## Outputs
 
@@ -49,11 +103,12 @@ You can find QSMxT at [brainlife.io](https://brainlife.io/) and execute it via t
 
 ```json
 {
-    "mag": ["magphase/mag.nii"],
-    "phase": ["magphase/phase.nii"],
-    "mag-json": ["magphase/mag.json"],
-    "phase-json": ["magphase/phase.json"],
-    "premade": "gre"
+    "mag": ["/home/ashley/repos/qsmxt-brainlife/bids/sub-1/anat/sub-1_echo-1_part-mag_MEGRE.nii"],
+    "phase": ["/home/ashley/repos/qsmxt-brainlife/bids/sub-1/anat/sub-1_echo-1_part-phase_MEGRE.nii"],
+    "mag-json": ["/home/ashley/repos/qsmxt-brainlife/bids/sub-1/anat/sub-1_echo-1_part-mag_MEGRE.json"],
+    "phase-json": ["/home/ashley/repos/qsmxt-brainlife/bids/sub-1/anat/sub-1_echo-1_part-phase_MEGRE.json"],
+    "cli-params": "",
+    "premade": "fast"
 }
 ```
 
@@ -67,22 +122,11 @@ You can find QSMxT at [brainlife.io](https://brainlife.io/) and execute it via t
 
 If you don't have your own input files, you can generate them using the [`qsm-forward`](https://github.com/astewartau/qsm-forward) package, which conveniently exists in Brainlife App form via the [QSM Data Generator](https://github.com/astewartau/qsm-forward-brainlife) Brainlife App. 
 
-```
-npm install -g brainlife
-bl login
-mkdir input
-bl dataset download 5a0f0fad2c214c9ba8624376#5a050966eec2b300611abff2 && mv 5a0f0fad2c214c9ba8624376#5a050966eec2b300611abff2 .
-```
-
 ## Output
 
-All output file (a resampled T1w NIFTI-1 file) will be generated inside the current working directory (pwd), inside a specifc directory called:
-
-```
-out_dir
-```
+All output files will be generated inside the current working directory (pwd), inside a specifc directory called `out_dir`.
 
 ### Dependencies
 
-This App requires `curl` and `singularity` to run.
+This App requires `curl`, `singularity`, and the `md5sum` command to run.
 
