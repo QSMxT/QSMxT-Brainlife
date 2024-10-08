@@ -13,60 +13,6 @@ QSM is a form of quantitative MRI that aims to measure the magnetic susceptibili
 
 The QSMxT Brainlife App takes a [`magphase`](https://brainlife.io/datatype/64792b1c79d13f6418e4fb75) datatype as input, which includes both the magnitude and phase components of an MRI acquisition as NIfTI files, and associated JSON sidecars.
 
-### Multi-echo data
-
-QSM often involves processing multi-echo magnitude and phase images. While data for QSM may have an arbitrary number of echoes, Brainlife requires discrete and expected numbers for input files. To get around this, you can store your multi-echo data as a 4D time-series. NIfTI images can be combined using `fsl` via `fslmerge`. JSON files can be merged using the `jsonmerge.py` script included in this repository. See the usage below for an example:
-
-```bash
-~: tree
-~/.../bids/sub-1/anat: tree
-.
-├── sub-1_echo-1_part-mag_MEGRE.json
-├── sub-1_echo-1_part-mag_MEGRE.nii
-├── sub-1_echo-1_part-phase_MEGRE.json
-├── sub-1_echo-1_part-phase_MEGRE.nii
-├── sub-1_echo-2_part-mag_MEGRE.json
-├── sub-1_echo-2_part-mag_MEGRE.nii
-├── sub-1_echo-2_part-phase_MEGRE.json
-├── sub-1_echo-2_part-phase_MEGRE.nii
-├── sub-1_echo-3_part-mag_MEGRE.json
-├── sub-1_echo-3_part-mag_MEGRE.nii
-├── sub-1_echo-3_part-phase_MEGRE.json
-├── sub-1_echo-3_part-phase_MEGRE.nii
-├── sub-1_echo-4_part-mag_MEGRE.json
-├── sub-1_echo-4_part-mag_MEGRE.nii
-├── sub-1_echo-4_part-phase_MEGRE.json
-└── sub-1_echo-4_part-phase_MEGRE.nii
-~: export FSLOUTPUTTYPE=NIFTI
-~: fslmerge -t mag.nii *mag*nii*
-~: fslmerge -t phase.nii *phase*nii*
-~: jsonmerge.py *mag*json mag.json
-~: jsonmerge.py *phase*json phase.json
-~: gunzip *.gz
-~: ls
-.
-├── mag.json
-├── mag.nii
-├── phase.json
-├── phase.nii
-├── sub-1_echo-1_part-mag_MEGRE.json
-├── sub-1_echo-1_part-mag_MEGRE.nii
-├── sub-1_echo-1_part-phase_MEGRE.json
-├── sub-1_echo-1_part-phase_MEGRE.nii
-├── sub-1_echo-2_part-mag_MEGRE.json
-├── sub-1_echo-2_part-mag_MEGRE.nii
-├── sub-1_echo-2_part-phase_MEGRE.json
-├── sub-1_echo-2_part-phase_MEGRE.nii
-├── sub-1_echo-3_part-mag_MEGRE.json
-├── sub-1_echo-3_part-mag_MEGRE.nii
-├── sub-1_echo-3_part-phase_MEGRE.json
-├── sub-1_echo-3_part-phase_MEGRE.nii
-├── sub-1_echo-4_part-mag_MEGRE.json
-├── sub-1_echo-4_part-mag_MEGRE.nii
-├── sub-1_echo-4_part-phase_MEGRE.json
-└── sub-1_echo-4_part-phase_MEGRE.nii
-```
-
 ## Outputs
 
 The QSMxT Brainlife App produces a [`qsm`](https://brainlife.io/datatype/62b03ee2ab3e66978064ed79) datatype as output in NIfTI format, with voxel values measured in parts-per-million (ppm). 
