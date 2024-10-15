@@ -69,7 +69,7 @@ for input_entry in config_json.get('_inputs', []):
         suffix = "MEGRE" if echo else "T2starw"
 
         # Determine whether the file is magnitude or phase based on tags
-        tags = input_entry.get("tags", [])
+        tags = input_entry.get("tags", []) + input_entry.get("datatype_tags", [])
         if "part-mag" in tags:
             part = "mag"
         elif "part-phase" in tags:
