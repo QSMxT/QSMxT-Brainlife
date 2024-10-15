@@ -44,6 +44,9 @@ if not all(key in config_json for key in keys):
 # Base directory: assuming this is the parent directory where the "task_id" directories are located
 base_directory = os.path.abspath("..")
 
+# choose a random subject name for any data without a subject identifier
+subject_rand = str(uuid.uuid4()).replace("-", "")
+
 # Iterate over each element in the _inputs array
 for input_entry in config_json.get('_inputs', []):
     # Check if the "id" is "inputs"
@@ -61,7 +64,7 @@ for input_entry in config_json.get('_inputs', []):
 
         # Fetch required fields for renaming
         meta = input_entry.get("meta", {})
-        subject = meta.get("subject") or str(uuid.uuid4()).replace("-", "")
+        subject = meta.get("subject") or subject_rand
 
         # Fetch optional fields
         session = meta.get("session")
