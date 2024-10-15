@@ -5,6 +5,7 @@ print("[INFO] Importing modules...")
 import json
 import os
 import shutil
+import uuid
 import glob
 import nibabel as nib
 
@@ -60,9 +61,7 @@ for input_entry in config_json.get('_inputs', []):
 
         # Fetch required fields for renaming
         meta = input_entry.get("meta", {})
-        subject = meta.get("subject")
-        if not subject:
-            raise ValueError(f"Missing required 'subject' field in input entry: {input_entry}")
+        subject = meta.get("subject") or str(uuid.uuid4()).replace("-", "")
 
         # Fetch optional fields
         session = meta.get("session")
