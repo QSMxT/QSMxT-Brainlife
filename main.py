@@ -40,12 +40,13 @@ if not all(key in config_json for key in ['phase', 'magnitude']):
     raise KeyError("Missing required keys: 'phase' or 'magnitude'")
 
 print("[INFO] Checking for subjects...")
-subjects = list({subject for input_entry in config_json.get('_inputs', []) if input_entry.get('meta', {}).get("subject")})
+subject_rand = str(uuid.uuid4()).replace("-", "")
+subjects = list({
+    input_entry.get('meta', {}).get("subject") or subject_rand 
+    for input_entry in config_json.get('_inputs', [])
+})
 if len(subjects) > 1:
     raise RuntimeError("Multiple subjects found! This App can only process one at a time.")
-
-# random subject ID in case no subject identifier is available
-subject_rand = str(uuid.uuid4()).replace("-", "")
 
 # Base directory: assuming this is the parent directory where the "task_id" directories are located
 base_directory = os.path.abspath("..")
