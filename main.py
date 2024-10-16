@@ -136,5 +136,5 @@ for qsm_file in qsm_files:
     print(f"[INFO] Copying {qsm_file} to {os.path.join(out_dir, f'qsm.nii')}")
     shutil.copy(qsm_file, os.path.join(out_dir, f"qsm.nii"))
 
-shutil.copy(sorted(phs_files)[0].replace('.nii.gz', '.nii').replace('.nii', '.json'), os.path.join(out_dir, f"qsm.json"))
+shutil.copy(sorted(phs_files)[0][0].replace('.nii.gz', '.nii').replace('.nii', '.json'), os.path.join(out_dir, f"qsm.json"))
 
