@@ -120,6 +120,7 @@ print("[INFO] Collecting outputs...")
 qsm_files_with_session = glob.glob(os.path.join(qsm_dir, "sub-*", "ses-*", "anat", "*Chimap.nii*"))
 qsm_files_without_session = glob.glob(os.path.join(qsm_dir, "sub-*", "anat", "*Chimap.nii*"))
 qsm_files = qsm_files_with_session + qsm_files_without_session
+qsm_files = [qsm_file for qsm_file in qsm_files if 'desc-singlepass' not in qsm_file]
 
 if len(qsm_files) == 0:
     raise RuntimeError(f"No QSM files found in output directory {os.path.join(qsm_dir, 'qsm')}!")
