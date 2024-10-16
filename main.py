@@ -83,6 +83,7 @@ if len(mag_files) != len(phs_files):
     raise RuntimeError(f"Number of magnitude files ({len(mag_files)}) must equal number of phase files ({len(phs_files)})!")
 
 # Second loop: Copy the files and write the JSON metadata
+out_json_copied = False
 for file_info in mag_files + phs_files:
     file_path, subject, session, echo, part, suffix, meta = file_info
 
@@ -108,6 +109,10 @@ for file_info in mag_files + phs_files:
     print(f"[INFO] Writing meta data to {json_dest_path}")
     with open(json_dest_path, 'w') as json_file:
         json.dump(meta, json_file, indent=4)
+    if part == 'phase' and not out_json_copied:
+        with open(os.path.join(out_dir, 'qsm.json'), 'w') as json_file:
+            json.dump(meta, json_file, indent=4)
+        out_json_copied = True
 
 print("[INFO] Running nifti-convert...")
 sys_cmd(cmd=f"nifti-convert {in_dir} {bids_dir} --auto_yes", print_output=True, raise_exception=True)
@@ -135,6 +140,4 @@ for qsm_file in qsm_files:
 
     print(f"[INFO] Copying {qsm_file} to {os.path.join(out_dir, f'qsm.nii')}")
     shutil.copy(qsm_file, os.path.join(out_dir, f"qsm.nii"))
-
-shutil.copy(sorted(phs_files)[0][0].replace('.nii.gz', '.nii').replace('.nii', '.json'), os.path.join(out_dir, f"qsm.json"))
 
