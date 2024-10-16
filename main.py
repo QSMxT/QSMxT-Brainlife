@@ -37,7 +37,7 @@ if cli_params:
 
 # Check if all required keys exist
 print("[INFO] Checking required keys...")
-keys = ['t2starw']
+keys = ['phase', 'magnitude']
 if not all(key in config_json for key in keys):
     raise KeyError("Not all required keys found in the configuration.")
 
@@ -50,7 +50,7 @@ subject_rand = str(uuid.uuid4()).replace("-", "")
 # Iterate over each element in the _inputs array
 for input_entry in config_json.get('_inputs', []):
     # Check if the "id" is "inputs"
-    if input_entry.get('id') == 'inputs':
+    if input_entry.get('id') in ['magnitude', 'phase']:
         task_id = input_entry.get('task_id')
         subdir = input_entry.get('subdir')
 
