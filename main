@@ -5,7 +5,7 @@
 #SBATCH --mem=16G
 #SBATCH --time=01:00:00
 
-export container=qsmxt_7.2.0_20240830
+export container=qsmxt_7.2.1_20241022
 
 echo "[INFO] Checking SINGULARITY_BINDPATH..."
 echo $SINGULARITY_BINDPATH
