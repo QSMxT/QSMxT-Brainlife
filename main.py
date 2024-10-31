@@ -37,7 +37,9 @@ if cli_params:
 # Check if all required keys exist
 print("[INFO] Checking required keys...")
 if not all(key in config_json for key in ['phase', 'magnitude']):
-    raise KeyError("Missing required keys: 'phase' or 'magnitude'")
+    raise RuntimeError("Missing required keys: 'phase' or 'magnitude'")
+if len(config_json['phase']) != len(config_json['magnitude']):
+    raise RuntimeError(f"Unequal number of magnitude ({config_json['magnitude']}) and phase ({config_json['phase']}) files")
 
 print("[INFO] Checking for subjects...")
 subject_rand = str(uuid.uuid4()).replace("-", "")
@@ -77,7 +79,7 @@ for input_entry in config_json.get('_inputs', []):
             part = "phase"
             phs_files.append((file_path, subject, session, echo, part, suffix, meta))
         else:
-            raise ValueError(f"Missing required 'part-mag' or 'part-phase' tag in input entry: {input_entry}")
+            raise RuntimeError(f"Missing required 'part-mag' or 'part-phase' tag in input entry: {input_entry}")
 
 if len(mag_files) != len(phs_files):
     raise RuntimeError(f"Number of magnitude files ({len(mag_files)}) must equal number of phase files ({len(phs_files)})!")
