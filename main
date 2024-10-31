@@ -5,13 +5,13 @@
 #SBATCH --mem=16G
 #SBATCH --time=01:00:00
 
-export container=qsmxt_7.2.1_20241022
+container=qsmxt_7.2.2_20241029
+md5sum=fc2c9969ea4779a9fb6eb56a0e2145ad
 
 echo "[INFO] Checking SINGULARITY_BINDPATH..."
 echo $SINGULARITY_BINDPATH
 
 echo "[INFO] Checking for existing container..."
-md5sum=f29e4546d1ba5efe406b65c6b3887e5b
 if [[ -f "${container}.simg" ]]; then
     echo "[INFO] Found existing container."
     echo "[INFO] Checking md5sum..."
